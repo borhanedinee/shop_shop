@@ -49,7 +49,10 @@ class SignUpScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: MyButton(
-                        onPressed: () {},
+                        onPressed: () {
+                        Get.to(SignUpScreen());
+
+                        },
                         child: const Text(
                           'Sign up',
                           style: TextStyle(color: Colors.white),
