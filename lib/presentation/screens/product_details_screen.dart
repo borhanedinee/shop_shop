@@ -1,12 +1,19 @@
 // ----------------- presentation/views/product_detail_screen.dart -----------------
 import 'package:deels_here/domain/models/cart_item_model.dart';
+import 'package:deels_here/domain/models/product_model.dart';
 import 'package:deels_here/presentation/controller/cart_controller.dart';
 import 'package:deels_here/presentation/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+final Map<String, Color> colorMap = {
+  "Black": Colors.black,
+  "White": Colors.white,
+  "Blue": Colors.blue,
+};
+
 class ProductDetailScreen extends StatefulWidget {
-  final CartItemModel item;
+  final ProductModel item;
 
   const ProductDetailScreen({Key? key, required this.item}) : super(key: key);
 
@@ -15,26 +22,12 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  String selectedSize = 'XL'; // Default size
-  Color selectedColor = Colors.grey; // Default color (gray from image)
-  int quantity = 2; // Default quantity from image
-
-  final List<String> sizes = ['S', 'M', 'L', 'XL'];
-  final List<Color> colors = [
-    Colors.black,
-    Colors.blue[900]!,
-    Colors.yellow[100]!,
-    Colors.grey,
-    Colors.pink[200]!,
-    Colors.green[900]!,
-  ];
-
-  double get totalPrice => widget.item.price * quantity;
+  String selectedSize = '';
+  String selectedColor = '';
+  int quantity = 1;
 
   @override
   Widget build(BuildContext context) {
-    final CartController cartController = Get.find<CartController>();
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -60,9 +53,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           margin: EdgeInsets.all(16),
                           width: MediaQuery.of(context).size.width,
                           height: 200,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
+                            child: Image.network(
+                              widget.item.avatar,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         Row(
@@ -89,8 +85,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy',
+                        Text(
+                          widget.item.description,
                           style: TextStyle(color: Colors.grey),
                         ),
                         const SizedBox(height: 16),
@@ -99,76 +95,109 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        Row(
-                          children:
-                              sizes
-                                  .map(
-                                    (size) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 8.0,
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children:
+                                widget.item.sizes
+                                    .map(
+                                      (size) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 8.0,
+                                        ),
+                                        child: ChoiceChip(
+                                          selected: selectedSize == size,
+                                          label: Text(size),
+                                          onSelected: (selected) {
+                                            if (selected) {
+                                              setState(() {
+                                                selectedSize = size;
+                                              });
+                                            }
+                                          },
+                                        ),
                                       ),
-                                      child: ChoiceChip(
-                                        label: Text(size),
-                                        selected: selectedSize == size,
-                                        onSelected: (selected) {
-                                          if (selected) {
-                                            setState(() {
-                                              selectedSize = size;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
+                                    )
+                                    .toList(),
+                          ),
                         ),
+
                         const SizedBox(height: 16),
                         const Text(
-                          'Item Color',
+                          'Seller',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Row(
-                          children:
-                              colors
-                                  .map(
-                                    (color) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 8.0,
-                                      ),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedColor = color;
-                                          });
-                                        },
-                                        child: Container(
-                                          width: 30,
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: color,
-                                            border: Border.all(
+                          children: [
+                            // avatar
+                            SizedBox(
+                              width: 30,
+                              height: 30,
+                              child: Image.asset(
+                                'assets/images/seller-avatar.png',
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              widget.item.sellerName,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+                        if (widget.item.colors != null &&
+                            widget.item.colors!.isNotEmpty) ...[
+                          const Text(
+                            'Item Color',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children:
+                                widget.item.colors
+                                    .map(
+                                      (color) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 8.0,
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedColor = color;
+                                            });
+                                          },
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
                                               color:
-                                                  selectedColor == color
-                                                      ? Colors.black
-                                                      : Colors.transparent,
-                                              width: 2,
+                                                  colorMap[color] ??
+                                                  Colors.grey,
+                                              border: Border.all(
+                                                color:
+                                                    selectedColor == color
+                                                        ? Colors.grey
+                                                        : Colors.transparent,
+                                                width: 3,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                  .toList(),
-                        ),
+                                    )
+                                    .toList(),
+                          ),
+                        ],
                         const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
-                                const Text('Qty'),
+                                const Text('Count'),
                                 const SizedBox(width: 16),
                                 IconButton(
                                   icon: const Icon(Icons.remove),
@@ -184,15 +213,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.add),
                                   onPressed: () {
-                                    setState(() {
-                                      quantity++;
-                                    });
+                                    if (quantity < widget.item.stock) {
+                                      setState(() {
+                                        quantity++;
+                                      });
+                                    }
                                   },
                                 ),
                               ],
                             ),
                             Text(
-                              'TOTAL \$${totalPrice.toStringAsFixed(2)}',
+                              '${widget.item.price.toInt() * quantity} DA',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -200,37 +231,62 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 100),
                       ],
                     ),
                   ),
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    right: 16,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: MyButton(
-                        onPressed: () {
-                          // Create a new CartItemModel with updated size and quantity
-                          final updatedItem = CartItemModel(
-                            id: widget.item.id,
-                            name: widget.item.name,
-                            size: selectedSize,
-                            quantity: quantity,
-                            price: widget.item.price,
-                          );
-                          // cartController.addToCart(updatedItem);
-                          Get.snackbar(
-                            'Success',
-                            '${widget.item.name} added to cart',
-                          );
-                        },
-                        child: const Text(
-                          'Add to cart',
-                          style: TextStyle(color: Colors.white),
+                  GetBuilder<CartController>(
+                    builder:
+                        (controller) => Positioned(
+                          bottom: 16,
+                          left: 16,
+                          right: 16,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: MyButton(
+                              onPressed: () {
+                                if (selectedSize.isEmpty) {
+                                  Get.showSnackbar(
+                                    GetSnackBar(
+                                      title: 'Error',
+                                      message: 'Please select size ',
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                if (widget.item.colors.isNotEmpty &&
+                                    selectedColor.isEmpty) {
+                                  Get.showSnackbar(
+                                    GetSnackBar(
+                                      title: 'Error',
+                                      message: 'Please select size ',
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                controller.addToCart(
+                                  CartItem(
+                                    productId: widget.item.id,
+                                    name: widget.item.name,
+                                    avatar: widget.item.avatar,
+                                    price: widget.item.price.toInt() * quantity,
+                                    size: selectedSize,
+                                    color: selectedColor,
+                                    quantity: quantity,
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                controller.isAddingToCart
+                                    ? 'Adding to cart...'
+                                    : 'Add to cart',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                   ),
                 ],
               ),

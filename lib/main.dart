@@ -1,8 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:deels_here/domain/models/user_model.dart';
+import 'package:deels_here/firebase_options.dart';
+import 'package:deels_here/presentation/controller/cart_controller.dart';
+import 'package:deels_here/presentation/controller/home_controller.dart';
+import 'package:deels_here/presentation/controller/login_controller.dart';
+import 'package:deels_here/presentation/controller/signup_controller.dart';
 import 'package:deels_here/presentation/screens/login_screen.dart';
+import 'package:deels_here/presentation/screens/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-void main() {
+final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+UserModel? currentUser;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -15,25 +30,17 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      initialBinding: BindingsBuilder(() {
+        // Initialize any controllers or services here
+        Get.put(CartController());
+        Get.put(LoginController());
+        Get.put(SignupController());
+        Get.put(HomeController());
+      }),
+      home: SplashScreen(),
     );
   }
 }

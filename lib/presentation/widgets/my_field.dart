@@ -5,13 +5,17 @@ import 'package:flutter/material.dart';
 class MyField extends StatelessWidget {
   final String label;
   final bool obscureText;
-  final Function(String) onChanged;
+  final Function(String)? onChanged;
+  final TextEditingController? controller;
+  final Widget? suffixIcon;
 
   const MyField({
     Key? key,
     required this.label,
     this.obscureText = false,
-    required this.onChanged,
+    this.onChanged,
+    this.controller,
+    this.suffixIcon,
   }) : super(key: key);
 
   @override
@@ -19,15 +23,17 @@ class MyField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        controller: controller,
         obscureText: obscureText,
         onChanged: onChanged,
         decoration: InputDecoration(
+          suffixIcon: suffixIcon,
           hintText: label,
           hintStyle: const TextStyle(color: Colors.grey),
           filled: true,
           fillColor: AppColors.fieldBackground,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(36),
+            borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide.none,
           ),
         ),

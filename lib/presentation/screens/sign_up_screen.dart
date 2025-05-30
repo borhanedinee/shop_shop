@@ -1,13 +1,39 @@
 // ----------------- presentation/views/login_screen.dart -----------------
+import 'package:deels_here/domain/models/user_model.dart';
+import 'package:deels_here/main.dart';
 import 'package:deels_here/presentation/controller/login_controller.dart';
 import 'package:deels_here/presentation/controller/signup_controller.dart';
+import 'package:deels_here/presentation/screens/main_screen.dart';
 import 'package:deels_here/presentation/widgets/my_button.dart';
 import 'package:deels_here/presentation/widgets/my_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SignUpScreen extends StatelessWidget {
-  final SignupController controller = Get.put(SignupController());
+class SignUpScreen extends StatefulWidget {
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  bool obsecureText = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,18 +54,65 @@ class SignUpScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    MyField(label: 'First name', onChanged: (value) {}),
-                    MyField(label: 'Last name', onChanged: (value) {}),
-
-                    MyField(label: 'Email', onChanged: (value) {}),
                     MyField(
-                      label: 'Password',
-                      obscureText: true,
+                      controller: firstNameController,
+                      label: 'First name',
                       onChanged: (value) {},
                     ),
                     MyField(
+                      controller: lastNameController,
+                      label: 'Last name',
+                      onChanged: (value) {},
+                    ),
+
+                    MyField(
+                      controller: emailController,
+                      label: 'Email',
+                      onChanged: (value) {},
+                    ),
+                    MyField(
+                      controller: phoneController,
+                      label: 'Phone',
+                      onChanged: (value) {},
+                    ),
+                    MyField(
+                      controller: passwordController,
+                      label: 'Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obsecureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            obsecureText = !obsecureText;
+                          });
+                        },
+                      ),
+
+                      obscureText: !obsecureText,
+
+                      onChanged: (value) {},
+                    ),
+                    MyField(
+                      controller: confirmPasswordController,
                       label: 'Confirm Password',
-                      obscureText: true,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obsecureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            obsecureText = !obsecureText;
+                          });
+                        },
+                      ),
+
+                      obscureText: !obsecureText,
+
                       onChanged:
                           (
                             value,
@@ -48,15 +121,91 @@ class SignUpScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
-                      child: MyButton(
-                        onPressed: () {
-                        Get.to(SignUpScreen());
+                      child: GetBuilder<SignupController>(
+                        builder:
+                            (controller) => MyButton(
+                              onPressed: () {
+                                if (passwordController.text !=
+                                    confirmPasswordController.text) {
+                                  Get.showSnackbar(
+                                    GetSnackBar(
+                                      title: 'Error',
+                                      message: 'Passwords do not match',
+                                      duration: Duration(seconds: 3),
+                                      snackPosition: SnackPosition.BOTTOM,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                // create user
+                                if (firstNameController.text.isEmpty ||
+                                    lastNameController.text.isEmpty ||
+                                    emailController.text.isEmpty ||
+                                    phoneController.text.isEmpty ||
+                                    passwordController.text.isEmpty) {
+                                  Get.showSnackbar(
+                                    GetSnackBar(
+                                      title: 'Error',
+                                      message: 'Please fill all fields',
+                                      duration: Duration(seconds: 3),
+                                      snackPosition: SnackPosition.BOTTOM,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                String uid =
+                                    DateTime.now().millisecondsSinceEpoch
+                                        .toString();
 
-                        },
-                        child: const Text(
-                          'Sign up',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                                // create user model
+                                final user = UserModel(
+                                  id: uid,
+                                  firstName: firstNameController.text,
+                                  secondName: lastNameController.text,
+                                  email: emailController.text,
+                                  phone: phoneController.text,
+                                  password: passwordController.text,
+                                );
+                                Get.find<SignupController>()
+                                    .signUpUser(user)
+                                    .then((error) {
+                                      if (error == null) {
+                                        // save user
+                                        currentUser = user;
+                                        Get.showSnackbar(
+                                          GetSnackBar(
+                                            title: 'Success',
+                                            message:
+                                                'Account created successfully',
+                                            duration: Duration(seconds: 3),
+                                            snackPosition: SnackPosition.BOTTOM,
+                                          ),
+                                        );
+                                        // Navigate to login screen
+                                        Navigator.of(
+                                          context,
+                                        ).pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                            builder: (context) => MainScreen(),
+                                          ),
+                                          (route) => false,
+                                        );
+                                      } else {
+                                        Get.snackbar(
+                                          'Error',
+                                          error,
+                                          snackPosition: SnackPosition.BOTTOM,
+                                        );
+                                      }
+                                    });
+                              },
+                              child: Text(
+                                controller.isLoading
+                                    ? 'Signing up...'
+                                    : 'Sign up',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
                       ),
                     ),
                     TextButton(

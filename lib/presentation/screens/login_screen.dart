@@ -7,18 +7,27 @@ import 'package:deels_here/presentation/widgets/my_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LoginScreen extends StatelessWidget {
-  final LoginController controller = Get.put(LoginController());
+class LoginScreen extends StatefulWidget {
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  bool obsecureText = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Log in to your account',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
       body: LayoutBuilder(
         builder:
             (context, constraints) => Container(
@@ -29,38 +38,80 @@ class LoginScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    MyField(label: 'Email', onChanged: (value) {}),
+                    SizedBox(height: constraints.maxHeight * 0.2),
+
+                    const Text(
+                      'Log in to your account',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
                     MyField(
-                      label: 'Password',
-                      obscureText: true,
+                      controller: emailController,
+                      label: 'Email',
                       onChanged: (value) {},
                     ),
                     MyField(
-                      label: 'Confirm Password',
-                      obscureText: true,
-                      onChanged:
-                          (
-                            value,
-                          ) {}, // Not used in login logic but included as per design
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            obsecureText = !obsecureText;
+                          });
+                        },
+                        icon: Icon(
+                          obsecureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                      ),
+                      controller: passwordController,
+                      label: 'Password',
+                      obscureText: obsecureText,
+                      onChanged: (value) {},
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
-                      child: MyButton(
-                        onPressed: () {
-                          Get.to(MainScreen());
-                        },
-                        child: const Text(
-                          'Sign in',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                      child: GetBuilder<LoginController>(
+                        builder:
+                            (controller) => MyButton(
+                              onPressed: () {
+                                // check if email or password is empty
+                                if (emailController.text == '' ||
+                                    passwordController.text == '') {
+                                  Get.showSnackbar(
+                                    GetSnackBar(
+                                      title: "Login Error",
+                                      message:
+                                          "Email and password cannot be empty",
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                controller.signIn(
+                                  emailController.text,
+                                  passwordController.text,
+                                );
+                              },
+                              child: Text(
+                                controller.isLoading
+                                    ? 'Signing in...'
+                                    : 'Sign in',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
                       ),
                     ),
                     TextButton(
                       onPressed: () {
-                        Get.to(SignUpScreen());
+                        Get.to(() => SignUpScreen());
                       },
-                      child: const Text('Don`t have an account ? Sign up'),
+                      child: Text('Don`t have an account ? Sign up'),
                     ),
                   ],
                 ),

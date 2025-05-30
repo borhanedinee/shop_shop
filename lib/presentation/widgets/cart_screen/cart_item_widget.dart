@@ -1,9 +1,10 @@
 import 'package:deels_here/core/themes/app_colors.dart';
 import 'package:deels_here/domain/models/cart_item_model.dart';
+import 'package:deels_here/presentation/screens/product_details_screen.dart';
 import 'package:flutter/material.dart';
 
 class CartItemWidget extends StatelessWidget {
-  final CartItemModel item;
+  final CartItem item;
   final VoidCallback onRemove;
 
   const CartItemWidget({Key? key, required this.item, required this.onRemove})
@@ -23,8 +24,14 @@ class CartItemWidget extends StatelessWidget {
             Container(
               width: 80,
               height: 80,
-              color: Colors.grey[300],
               margin: const EdgeInsets.only(right: 16.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  item.avatar, // Assuming image is stored in assets
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             Expanded(
               child: Column(
@@ -50,13 +57,13 @@ class CartItemWidget extends StatelessWidget {
                     children: [
                       Text('Size: ${item.size}'),
                       const SizedBox(width: 16),
-                      Text('Color: '),
+                      Text('Color:   '),
                       Container(
-                        width: 20,
-                        height: 20,
+                        width: 15,
+                        height: 15,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: _getColorForItem(item.name),
+                          color: colorMap[item.color],
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -69,7 +76,7 @@ class CartItemWidget extends StatelessWidget {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.blue,
+                      color: AppColors.primaryColor,
                     ),
                   ),
                 ],

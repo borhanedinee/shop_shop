@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "418112911711",
+    "project_id": "buyerrs-79562",
+    "storage_bucket": "buyerrs-79562.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:418112911711:android:361de94ad41f28e66fdeea",
+        "android_client_info": {
+          "package_name": "com.example.deels_here"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZSHFoFjSywuIxRGXZwU0LZd00r9eQX1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

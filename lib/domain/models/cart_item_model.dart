@@ -1,32 +1,43 @@
-// ----------------- data/models/cart_item_model.dart -----------------
-class CartItemModel {
-  final String id;
+class CartItem {
+  final String productId;
   final String name;
-  final String size;
+  final int price;
   final int quantity;
-  final double price;
+  final String avatar;
+  final String size;
+  final String color;
 
-  CartItemModel({
-    required this.id,
+  CartItem({
+    required this.productId,
     required this.name,
-    required this.size,
-    required this.quantity,
     required this.price,
+    required this.quantity,
+    required this.avatar,
+    required this.size,
+    required this.color,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'size': size,
-    'quantity': quantity,
-    'price': price,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      'productId': productId,
+      'name': name,
+      'price': price,
+      'quantity': quantity,
+      'avatar': avatar,
+      'size': size,
+      'color': color,
+    };
+  }
 
-  factory CartItemModel.fromJson(Map<String, dynamic> json) => CartItemModel(
-    id: json['id'],
-    name: json['name'],
-    size: json['size'],
-    quantity: json['quantity'],
-    price: json['price'].toDouble(),
-  );
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
+      productId: json['productId'],
+      name: json['name'],
+      price: json['price'],
+      quantity: json['quantity'],
+      avatar: json['avatar'],
+      size: json['size'],
+      color: json['color'],
+    );
+  }
 }
