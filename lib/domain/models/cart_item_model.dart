@@ -1,5 +1,5 @@
 class CartItem {
-  final String productId;
+  final String cartItemId;
   final String name;
   final int price;
   final int quantity;
@@ -8,7 +8,7 @@ class CartItem {
   final String color;
 
   CartItem({
-    required this.productId,
+    required this.cartItemId,
     required this.name,
     required this.price,
     required this.quantity,
@@ -19,7 +19,7 @@ class CartItem {
 
   Map<String, dynamic> toJson() {
     return {
-      'productId': productId,
+      'productId': cartItemId,
       'name': name,
       'price': price,
       'quantity': quantity,
@@ -31,7 +31,7 @@ class CartItem {
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
-      productId: json['productId'],
+      cartItemId: json['productId'],
       name: json['name'],
       price: json['price'],
       quantity: json['quantity'],

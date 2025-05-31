@@ -1,4 +1,4 @@
-// ----------------- core/widgets/cart_item_widget.dart -----------------
+// presentation/screens/cart_screen.dart
 import 'package:deels_here/core/themes/app_colors.dart';
 import 'package:deels_here/presentation/controller/cart_controller.dart';
 import 'package:deels_here/presentation/widgets/cart_screen/cart_item_widget.dart';
@@ -8,6 +8,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 
 class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
@@ -22,142 +24,157 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder:
-            (context, constraints) => GetBuilder<CartController>(
-              builder:
-                  (controller) => Container(
-                    height: constraints.maxHeight,
-                    child:
-                        controller.isFetchingCartItems
-                            ? Center(
-                              child: SpinKitFadingCircle(
-                                color: AppColors.primaryColor,
-                                size: 50.0,
+      body: SingleChildScrollView(
+        child: GetBuilder<CartController>(
+          builder:
+              (controller) =>
+                  controller.isFetchingCartItems
+                      ? Column(
+                        children: [
+                          const SizedBox(height: 400),
+                          Center(
+                            child: SpinKitFadingCircle(
+                              color: AppColors.primaryColor,
+                              size: 50.0,
+                            ),
+                          ),
+                        ],
+                      )
+                      : controller.cartItems.isEmpty
+                      ? _emptyCart()
+                      : Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Text(
+                              'Cart',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                               ),
-                            )
-                            : controller.cartItems.isEmpty
-                            ? _empty_cart()
-                            : Column(
+                            ),
+                          ),
+                          GetBuilder<CartController>(
+                            builder:
+                                (controller) => ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                  ),
+                                  itemCount: controller.cartItems.length,
+                                  itemBuilder: (context, index) {
+                                    final item = controller.cartItems[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 8.0,
+                                      ),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          // Get.to(ProductDetailScreen(item: item));
+                                        },
+                                        child: CartItemWidget(
+                                          item: item,
+                                          onRemove: () {
+                                            controller.removeFromCart(
+                                              item.cartItemId,
+                                            );
+                                            controller.update();
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(20),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, -5),
+                                ),
+                              ],
+                            ),
+                            child: Column(
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Cart',
-                                    style: TextStyle(fontSize: 24),
-                                  ),
+                                _buildSummaryRow(
+                                  'SUBTOTAL:',
+                                  '${controller.cartItems.fold(0.0, (sum, item) => sum + item.price).toInt()} DA',
                                 ),
-                                Expanded(
-                                  flex: 2,
-                                  child: GetBuilder<CartController>(
-                                    builder:
-                                        (controller) => ListView.builder(
-                                          itemCount:
-                                              controller.cartItems.length,
-                                          itemBuilder: (context, index) {
-                                            final item =
-                                                controller.cartItems[index];
-                                            return GestureDetector(
-                                              onTap: () {
-                                                // Get.to(ProductDetailScreen(item: item));
-                                              },
-                                              child: CartItemWidget(
-                                                item: item,
-                                                onRemove: () {
-                                                  controller.removeFromCart(
-                                                    item.productId,
-                                                  );
-                                                  controller.update();
-                                                },
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const Text('SUBTOTAL:'),
-                                            Text(
-                                              '${Get.find<CartController>().cartItems.fold(0.0, (sum, item) => sum + item.price).toStringAsFixed(2)} DA',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text('Delivery Fee:'),
-                                            Text(
-                                              '300 DA',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text('DISCOUNT:'),
-                                            Text(
-                                              '40%',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 32),
-                                        MyButton(
-                                          onPressed: () {
-                                            Get.snackbar(
-                                              'Success',
-                                              'Purchase completed!',
-                                            );
-                                          },
-                                          child: const Text(
-                                            'Buy now',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                const SizedBox(height: 8),
+                                _buildSummaryRow('Delivery Fee:', '300 DA'),
+                                const SizedBox(height: 8),
+                                _buildSummaryRow('DISCOUNT:', '40%'),
+                                const SizedBox(height: 24),
+                                MyButton(
+                                  onPressed: () {
+                                    Get.snackbar(
+                                      'Success',
+                                      'Purchase completed!',
+                                      snackPosition: SnackPosition.TOP,
+                                      backgroundColor: AppColors.primaryColor,
+                                      colorText: Colors.white,
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Buy Now',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                  ),
-            ),
+                          ),
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+        ),
       ),
     );
   }
 
-  Center _empty_cart() {
+  Widget _buildSummaryRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _emptyCart() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Icon
+          SizedBox(height: 300),
           Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
-          // Main Message
           const Text(
             'Your cart is empty',
             style: TextStyle(
@@ -167,7 +184,6 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          // Suggestion Text
           Text(
             'Add some products to get started!',
             style: TextStyle(fontSize: 16, color: Colors.grey[600]),

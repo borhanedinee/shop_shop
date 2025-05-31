@@ -34,9 +34,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
-        actions: [
-          IconButton(icon: const Icon(Icons.favorite_border), onPressed: () {}),
-        ],
       ),
       body: LayoutBuilder(
         builder:
@@ -52,7 +49,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Container(
                           margin: EdgeInsets.all(16),
                           width: MediaQuery.of(context).size.width,
-                          height: 200,
+                          height: 350,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
                             child: Image.network(
@@ -245,7 +242,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             width: double.infinity,
                             child: MyButton(
                               onPressed: () {
-                                if (selectedSize.isEmpty) {
+                                if (widget.item.sizes.isNotEmpty &&
+                                    selectedSize.isEmpty) {
                                   Get.showSnackbar(
                                     GetSnackBar(
                                       title: 'Error',
@@ -266,9 +264,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   );
                                   return;
                                 }
+
+                                final cartItemID =
+                                    DateTime.now().millisecondsSinceEpoch
+                                        .toString();
+
                                 controller.addToCart(
                                   CartItem(
-                                    productId: widget.item.id,
+                                    cartItemId: cartItemID,
                                     name: widget.item.name,
                                     avatar: widget.item.avatar,
                                     price: widget.item.price.toInt() * quantity,

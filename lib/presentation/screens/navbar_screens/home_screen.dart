@@ -2,6 +2,7 @@
 import 'package:deels_here/core/themes/app_colors.dart';
 import 'package:deels_here/domain/models/product_model.dart';
 import 'package:deels_here/presentation/controller/home_controller.dart';
+import 'package:deels_here/presentation/screens/others_categories_screen.dart';
 import 'package:deels_here/presentation/screens/product_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -129,11 +130,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             builder:
                                 (controller) =>
                                     controller.isFetchingProducts
-                                        ? const Center(
-                                          child: SpinKitFadingCircle(
-                                            color: AppColors.primaryColor,
-                                            size: 50.0,
-                                          ),
+                                        ? Column(
+                                          children: [
+                                            const SizedBox(height: 200),
+                                            const Center(
+                                              child: SpinKitFadingCircle(
+                                                color: AppColors.primaryColor,
+                                                size: 50.0,
+                                              ),
+                                            ),
+                                          ],
                                         )
                                         : controller.productsToDisplay.isEmpty
                                         ? _emptyProducts()
@@ -204,10 +210,22 @@ class _HomeScreenState extends State<HomeScreen> {
           controller.selectedCategory = 'All';
           controller.productsToDisplay = controller.allProducts;
           controller.update();
-        } else {
-          controller.selectedCategory = label;
-          controller.fetchProductsByCategory(label);
+          return;
         }
+
+        if (label == 'Other') {
+          controller.selectedCategory = 'All';
+          controller.productsToDisplay = controller.allProducts;
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => OthersStoresScreen()));
+          controller.update();
+
+          return;
+        }
+
+        controller.selectedCategory = label;
+        controller.fetchProductsByCategory(label);
         controller.update();
       },
       child: Chip(
@@ -257,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Text(
-                    '\$${product.price.toStringAsFixed(2)}',
+                    '${product.price.toInt()} DA',
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 4),

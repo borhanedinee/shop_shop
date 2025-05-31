@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
         Get.put(LoginController());
         Get.put(SignupController());
         Get.put(HomeController());
+        // Get.find<HomeController>().uploadProducts();
       }),
       home: SplashScreen(),
     );

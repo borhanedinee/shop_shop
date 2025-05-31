@@ -61,6 +61,8 @@ class HomeController extends GetxController {
           }).toList();
       productsToDisplay = filteredroducts;
     } catch (e) {
+      // Handle any errors that occur during the fetch
+      print('Error fetching products by category: $e');
       Get.showSnackbar(
         GetSnackBar(
           title: 'Error',
@@ -77,10 +79,13 @@ class HomeController extends GetxController {
 
   // filter searched products
   filterSearchedProducts(String value) async {
+    selectedCategory = 'All'; // Reset category filter
+    update();
     if (value.isEmpty) {
       productsToDisplay = allProducts;
     } else {
       // filter products based on search value
+
       isFetchingProducts = true;
       update(); // Notify listeners that fetching has started
       await Future.delayed(Duration(seconds: 1)); // Simulate network delay
@@ -96,148 +101,116 @@ class HomeController extends GetxController {
 
   final List<Map<String, dynamic>> productsToUpload = [
     {
-      "name": "Urban Tee Classic",
-      "description": "Soft and breathable cotton tee for everyday streetwear.",
-      "price": 3200,
+      "name": "Classic Teddy Bear",
+      "description": "A soft and cuddly teddy bear perfect for kids' playtime.",
+      "price": 2500,
       "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556486/tshirt-4_l8qeqt.webp",
-      "sizes": ["S", "M", "L", "XL"],
-      "category": "Clothing",
-      "stock": 100,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-      "colors": ["Black", "White", "Blue"],
-    },
-    {
-      "name": "Minimalist Vibe Tee",
-      "description": "Clean-cut design t-shirt perfect for casual fits.",
-      "price": 3000,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/tshirt-2_u4hqbf.webp",
-      "sizes": ["S", "M", "L"],
-      "category": "Clothing",
-      "stock": 80,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-      "colors": ["Black", "White", "Blue"],
-    },
-    {
-      "name": "Premium Fit Tee",
-      "description": "Modern fit t-shirt with durable stitching.",
-      "price": 3500,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/tshirt-3_n7tdmk.jpg",
-      "sizes": ["M", "L", "XL"],
-      "category": "Clothing",
-      "stock": 70,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-      "colors": ["Black", "White", "Blue"],
-    },
-    {
-      "name": "SpeedFlex Sneakers",
-      "description": "Lightweight and responsive sneakers for daily runs.",
-      "price": 6900,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/sneakers-3_tyzfz1.jpg",
-      "sizes": ["37", "38", "39", "40", "41", "42", "43", "44"],
-      "category": "Footwear",
-      "stock": 60,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-    },
-    {
-      "name": "Everyday Cotton Tee",
-      "description": "Essential cotton tee for layering or solo wear.",
-      "price": 2900,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/tshirt_ib70ff.webp",
-      "sizes": ["S", "M", "L", "XL"],
-      "category": "Clothing",
-      "stock": 90,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-      "colors": ["Black", "White", "Blue"],
-    },
-    {
-      "name": "Alpha Street Sneakers",
-      "description": "Bold style sneakers with comfort-engineered soles.",
-      "price": 7200,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/sneakers-4_fnvkmy.jpg",
-      "sizes": ["37", "38", "39", "40", "41", "42", "43", "44"],
-      "category": "Footwear",
-      "stock": 55,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-    },
-    {
-      "name": "Stealth Mode Hoodie",
-      "description": "Sleek black hoodie with a soft fleece interior.",
-      "price": 5800,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/hoodie-black_ef97h5.webp",
-      "sizes": ["S", "M", "L", "XL", "XXL"],
-      "category": "Clothing",
-      "stock": 75,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-      "colors": ["Black", "White", "Blue"],
-    },
-    {
-      "name": "Night Rider Hoodie",
-      "description": "All-black minimalist hoodie with warm comfort.",
-      "price": 6000,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/hoodie-black2_xv0o1k.webp",
-      "sizes": ["S", "M", "L", "XL"],
-      "category": "Clothing",
-      "stock": 65,
-      "isAvailable": true,
-      "sellerName": "ShopMaster",
-      "colors": ["Black", "White", "Blue"],
-    },
-    {
-      "name": "Classic Chill Hoodie",
-      "description": "Relaxed-fit hoodie perfect for cool evenings.",
-      "price": 5200,
-      "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/hoodie_i4wkgl.jpg",
-      "sizes": ["M", "L", "XL", "XXL"],
-      "category": "Clothing",
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720979/teddy-bear_xk20kh.jpg",
+      "category": "Kids Toys",
       "stock": 50,
       "isAvailable": true,
-      "sellerName": "ShopMaster",
-      "colors": ["Black", "White", "Blue"],
+      "sellerName": "ToyWorld",
+      "colors": ["Brown"],
     },
     {
-      "name": "TrailBlazer Sneakers",
-      "description": "Rugged and ready sneakers for the urban explorer.",
-      "price": 6700,
+      "name": "Ordinary for Acne",
+      "description":
+          "A lightweight acne treatment serum for clear and healthy skin.",
+      "price": 4500,
       "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/sneakers_s6b7du.webp",
-      "sizes": ["37", "38", "39", "40", "41", "42", "43", "44"],
-      "category": "Footwear",
-      "stock": 85,
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720979/ordinary-for-acne_wms8n7.webp",
+      "category": "Skin Care",
+      "stock": 30,
       "isAvailable": true,
-      "sellerName": "ShopMaster",
+      "sellerName": "SkinGlow",
     },
     {
-      "name": "Fusion X Sneakers",
-      "description": "Hybrid comfort sneakers with sporty design.",
-      "price": 7100,
+      "name": "Ordinary Alpha",
+      "description":
+          "An effective alpha hydroxy acid solution for skin exfoliation.",
+      "price": 3800,
       "avatar":
-          "https://res.cloudinary.com/djfpmaasb/image/upload/v1748556485/sneakerstwo_lqwz1h.webp",
-      "sizes": ["37", "38", "39", "40", "41", "42", "43", "44"],
-      "category": "Footwear",
-      "stock": 70,
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720979/ordinary-alpha_e4mvml.webp",
+      "category": "Skin Care",
+      "stock": 40,
       "isAvailable": true,
-      "sellerName": "ShopMaster",
+      "sellerName": "SkinGlow",
+    },
+    {
+      "name": "Rubik's Cube",
+      "description": "A classic brain-teasing puzzle toy for kids and adults.",
+      "price": 1200,
+      "avatar":
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720979/rubiks-cube_qq31cp.webp",
+      "category": "Kids Toys",
+      "stock": 75,
+      "isAvailable": true,
+      "sellerName": "ToyWorld",
+      "colors": ["Multicolor"],
+    },
+    {
+      "name": "AirPod Pro",
+      "description": "High-quality wireless earbuds with noise cancellation.",
+      "price": 18000,
+      "avatar":
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720978/airpod_pro_wudffi.jpg",
+      "category": "Electronics",
+      "stock": 20,
+      "isAvailable": true,
+      "sellerName": "TechTrend",
+      "colors": ["White"],
+    },
+    {
+      "name": "Blue Teddy Bear",
+      "description":
+          "A plush blue teddy bear for a fun and colorful play experience.",
+      "price": 2800,
+      "avatar":
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720978/blue-teddy-bear_ktss3x.webp",
+      "category": "Kids Toys",
+      "stock": 60,
+      "isAvailable": true,
+      "sellerName": "ToyWorld",
+      "colors": ["Blue"],
+    },
+    {
+      "name": "AirPods Max Noir",
+      "description": "Premium over-ear headphones with superior sound quality.",
+      "price": 45000,
+      "avatar":
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720978/airpods-max-noir-1_q0rn08.jpg",
+      "category": "Electronics",
+      "stock": 15,
+      "isAvailable": true,
+      "sellerName": "TechTrend",
+      "colors": ["Black"],
+    },
+    {
+      "name": "Apple Watch",
+      "description": "Smartwatch with fitness tracking and notifications.",
+      "price": 30000,
+      "avatar":
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720978/apple-watch_oul1ug.png",
+      "category": "Electronics",
+      "stock": 25,
+      "isAvailable": true,
+      "sellerName": "TechTrend",
+      "colors": ["Silver", "Black"],
+    },
+    {
+      "name": "Ordinary Dry Skin",
+      "description": "A moisturizing cream for dry skin relief and hydration.",
+      "price": 3200,
+      "avatar":
+          "https://res.cloudinary.com/dg6yzepco/image/upload/v1748720978/ordinary-dry-skin_ljey8f.jpg",
+      "category": "Skin Care",
+      "stock": 35,
+      "isAvailable": true,
+      "sellerName": "SkinGlow",
     },
   ];
 
   uploadProducts() async {
-    print('Uploading products to Firestore...');
     // via firebase
     for (final product in productsToUpload) {
       await FirebaseFirestore.instance.collection('products').add(product);

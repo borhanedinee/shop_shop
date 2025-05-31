@@ -24,7 +24,12 @@ class CartController extends GetxController {
               .get();
 
       cartItems =
-          snapshot.docs.map((doc) => CartItem.fromJson(doc.data())).toList();
+          snapshot.docs.map((doc) {
+            print('Cart items fetched hh: ${doc.id}');
+            final data = doc.data();
+            data['productId'] = doc.id; // Ensure productId is set from doc ID
+            return CartItem.fromJson(data);
+          }).toList();
     } catch (e) {
       Get.showSnackbar(
         GetSnackBar(
@@ -43,20 +48,15 @@ class CartController extends GetxController {
   bool isAddingToCart = false;
   Future<void> addToCart(CartItem item) async {
     try {
-      print('adding ${item.productId} ...');
       isAddingToCart = true;
       update();
       final userId = currentUser!.id;
-
-      int productID = DateTime.now().millisecondsSinceEpoch;
 
       final docRef = _firestore
           .collection('users')
           .doc(userId)
           .collection('cart')
-          .doc(productID.toString()); // 1 product per doc
-
-      print('docRef fetched ...');
+          .doc(item.cartItemId); // 1 product per doc
 
       final docSnapshot = await docRef.get();
 
@@ -64,6 +64,9 @@ class CartController extends GetxController {
         // If already exists, increase quantity
         await docRef.update({'quantity': FieldValue.increment(item.quantity)});
       } else {
+        print(
+          'docSnapshot does not exist, creating new with ${item.toJson()}...',
+        );
         await docRef.set(item.toJson());
       }
 
@@ -90,19 +93,18 @@ class CartController extends GetxController {
     }
   }
 
-  Future<void> removeFromCart(String productId) async {
+  Future<void> removeFromCart(String cardDoc) async {
     try {
       final userId = currentUser!.id;
-
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
           .collection('cart')
-          .doc(productId)
+          .doc(cardDoc)
           .delete();
 
       // Optionally update local state if you're using RxList
-      cartItems.removeWhere((item) => item.productId == productId);
+      cartItems.removeWhere((item) => item.cartItemId == cardDoc);
 
       Get.showSnackbar(
         GetSnackBar(
