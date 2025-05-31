@@ -2,6 +2,8 @@
 import 'package:deels_here/domain/models/cart_item_model.dart';
 import 'package:deels_here/domain/models/product_model.dart';
 import 'package:deels_here/presentation/controller/cart_controller.dart';
+import 'package:deels_here/presentation/screens/login_screen.dart';
+import 'package:deels_here/presentation/screens/seller_details_screen.dart';
 import 'package:deels_here/presentation/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -125,22 +127,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            // avatar
-                            SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: Image.asset(
-                                'assets/images/seller-avatar.png',
+                        InkWell(
+                          onTap: () {
+                            // navigate to seller details screen
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => SellerDetailsScreen(
+                                      sellerName: widget.item.sellerName,
+                                    ),
                               ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              widget.item.sellerName,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              // avatar
+                              SizedBox(
+                                width: 30,
+                                height: 30,
+                                child: Image.asset(
+                                  'assets/images/seller-avatar.png',
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                widget.item.sellerName,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(height: 16),
@@ -242,48 +257,60 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             width: double.infinity,
                             child: MyButton(
                               onPressed: () {
-                                if (widget.item.sizes.isNotEmpty &&
-                                    selectedSize.isEmpty) {
-                                  Get.showSnackbar(
-                                    GetSnackBar(
-                                      title: 'Error',
-                                      message: 'Please select size ',
-                                      duration: Duration(seconds: 2),
+                                if (isGuest) {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder: (context) => LoginScreen(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                } else {
+                                  if (widget.item.sizes.isNotEmpty &&
+                                      selectedSize.isEmpty) {
+                                    Get.showSnackbar(
+                                      GetSnackBar(
+                                        title: 'Error',
+                                        message: 'Please select size ',
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (widget.item.colors.isNotEmpty &&
+                                      selectedColor.isEmpty) {
+                                    Get.showSnackbar(
+                                      GetSnackBar(
+                                        title: 'Error',
+                                        message: 'Please select size ',
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  final cartItemID =
+                                      DateTime.now().millisecondsSinceEpoch
+                                          .toString();
+
+                                  controller.addToCart(
+                                    CartItem(
+                                      cartItemId: cartItemID,
+                                      name: widget.item.name,
+                                      avatar: widget.item.avatar,
+                                      price:
+                                          widget.item.price.toInt() * quantity,
+                                      size: selectedSize,
+                                      color: selectedColor,
+                                      quantity: quantity,
                                     ),
                                   );
-                                  return;
                                 }
-                                if (widget.item.colors.isNotEmpty &&
-                                    selectedColor.isEmpty) {
-                                  Get.showSnackbar(
-                                    GetSnackBar(
-                                      title: 'Error',
-                                      message: 'Please select size ',
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                final cartItemID =
-                                    DateTime.now().millisecondsSinceEpoch
-                                        .toString();
-
-                                controller.addToCart(
-                                  CartItem(
-                                    cartItemId: cartItemID,
-                                    name: widget.item.name,
-                                    avatar: widget.item.avatar,
-                                    price: widget.item.price.toInt() * quantity,
-                                    size: selectedSize,
-                                    color: selectedColor,
-                                    quantity: quantity,
-                                  ),
-                                );
                               },
                               child: Text(
                                 controller.isAddingToCart
                                     ? 'Adding to cart...'
+                                    : isGuest
+                                    ? 'Start Now'
                                     : 'Add to cart',
                                 style: TextStyle(color: Colors.white),
                               ),

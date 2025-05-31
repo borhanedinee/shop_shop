@@ -77,6 +77,26 @@ class HomeController extends GetxController {
     }
   }
 
+  // filter products by seller name
+  bool isFetchingSellerProducts = false;
+  List<ProductModel> sellerProducts = <ProductModel>[];
+
+  filterProductsBySellerName(String sellerName) async {
+    isFetchingSellerProducts = true;
+    update();
+    await Future.delayed(Duration(seconds: 2));
+    sellerProducts =
+        allProducts
+            .where(
+              (product) =>
+                  product.sellerName.toLowerCase() == sellerName.toLowerCase(),
+            )
+            .toList();
+
+    isFetchingSellerProducts = false;
+    update();
+  }
+
   // filter searched products
   filterSearchedProducts(String value) async {
     selectedCategory = 'All'; // Reset category filter

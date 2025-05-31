@@ -1,4 +1,5 @@
 // ----------------- presentation/views/login_screen.dart -----------------
+import 'package:deels_here/core/themes/app_colors.dart';
 import 'package:deels_here/presentation/controller/login_controller.dart';
 import 'package:deels_here/presentation/screens/main_screen.dart';
 import 'package:deels_here/presentation/screens/sign_up_screen.dart';
@@ -11,6 +12,8 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
+bool isGuest = false;
 
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
@@ -112,6 +115,35 @@ class _LoginScreenState extends State<LoginScreen> {
                         Get.to(() => SignUpScreen());
                       },
                       child: Text('Don`t have an account ? Sign up'),
+                    ),
+                    SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () {
+                        isGuest = true;
+                        // Default action: Navigate to the home screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => MainScreen()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                        elevation: 5,
+                      ),
+                      child: const Text(
+                        'Continue as Guest',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ],
                 ),

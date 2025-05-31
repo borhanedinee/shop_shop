@@ -1,7 +1,9 @@
 // presentation/screens/cart_screen.dart
 import 'package:deels_here/core/themes/app_colors.dart';
 import 'package:deels_here/presentation/controller/cart_controller.dart';
+import 'package:deels_here/presentation/screens/login_screen.dart';
 import 'package:deels_here/presentation/widgets/cart_screen/cart_item_widget.dart';
+import 'package:deels_here/presentation/widgets/gues_login_widget.dart';
 import 'package:deels_here/presentation/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -17,129 +19,141 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   void initState() {
-    Get.find<CartController>().fetchCartItems();
+    if (!isGuest) {
+      Get.find<CartController>().fetchCartItems();
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: GetBuilder<CartController>(
-          builder:
-              (controller) =>
-                  controller.isFetchingCartItems
-                      ? Column(
-                        children: [
-                          const SizedBox(height: 400),
-                          Center(
-                            child: SpinKitFadingCircle(
-                              color: AppColors.primaryColor,
-                              size: 50.0,
-                            ),
-                          ),
-                        ],
-                      )
-                      : controller.cartItems.isEmpty
-                      ? _emptyCart()
-                      : Column(
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              'Cart',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          GetBuilder<CartController>(
-                            builder:
-                                (controller) => ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                  ),
-                                  itemCount: controller.cartItems.length,
-                                  itemBuilder: (context, index) {
-                                    final item = controller.cartItems[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 8.0,
-                                      ),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          // Get.to(ProductDetailScreen(item: item));
-                                        },
-                                        child: CartItemWidget(
-                                          item: item,
-                                          onRemove: () {
-                                            controller.removeFromCart(
-                                              item.cartItemId,
-                                            );
-                                            controller.update();
-                                          },
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(20),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, -5),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                _buildSummaryRow(
-                                  'SUBTOTAL:',
-                                  '${controller.cartItems.fold(0.0, (sum, item) => sum + item.price).toInt()} DA',
-                                ),
-                                const SizedBox(height: 8),
-                                _buildSummaryRow('Delivery Fee:', '300 DA'),
-                                const SizedBox(height: 8),
-                                _buildSummaryRow('DISCOUNT:', '40%'),
-                                const SizedBox(height: 24),
-                                MyButton(
-                                  onPressed: () {
-                                    Get.snackbar(
-                                      'Success',
-                                      'Purchase completed!',
-                                      snackPosition: SnackPosition.TOP,
-                                      backgroundColor: AppColors.primaryColor,
-                                      colorText: Colors.white,
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Buy Now',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+      body:
+          isGuest
+              ? GuestLoginWidget()
+              : SingleChildScrollView(
+                child: GetBuilder<CartController>(
+                  builder:
+                      (controller) =>
+                          controller.isFetchingCartItems
+                              ? Column(
+                                children: [
+                                  const SizedBox(height: 400),
+                                  Center(
+                                    child: SpinKitFadingCircle(
+                                      color: AppColors.primaryColor,
+                                      size: 50.0,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 100),
-                        ],
-                      ),
-        ),
-      ),
+                                ],
+                              )
+                              : controller.cartItems.isEmpty
+                              ? _emptyCart()
+                              : Column(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Text(
+                                      'Cart',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  GetBuilder<CartController>(
+                                    builder:
+                                        (controller) => ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0,
+                                          ),
+                                          itemCount:
+                                              controller.cartItems.length,
+                                          itemBuilder: (context, index) {
+                                            final item =
+                                                controller.cartItems[index];
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: 8.0,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  // Get.to(ProductDetailScreen(item: item));
+                                                },
+                                                child: CartItemWidget(
+                                                  item: item,
+                                                  onRemove: () {
+                                                    controller.removeFromCart(
+                                                      item.cartItemId,
+                                                    );
+                                                    controller.update();
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[50],
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(20),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, -5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        _buildSummaryRow(
+                                          'SUBTOTAL:',
+                                          '${controller.cartItems.fold(0.0, (sum, item) => sum + item.price).toInt()} DA',
+                                        ),
+                                        const SizedBox(height: 8),
+                                        _buildSummaryRow(
+                                          'Delivery Fee:',
+                                          '300 DA',
+                                        ),
+                                        const SizedBox(height: 8),
+                                        _buildSummaryRow('DISCOUNT:', '40%'),
+                                        const SizedBox(height: 24),
+                                        MyButton(
+                                          onPressed: () {
+                                            Get.snackbar(
+                                              'Success',
+                                              'Purchase completed!',
+                                              snackPosition: SnackPosition.TOP,
+                                              backgroundColor:
+                                                  AppColors.primaryColor,
+                                              colorText: Colors.white,
+                                            );
+                                          },
+                                          child: const Text(
+                                            'Buy Now',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 100),
+                                ],
+                              ),
+                ),
+              ),
     );
   }
 

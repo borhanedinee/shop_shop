@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deels_here/domain/models/cart_item_model.dart';
-import 'package:deels_here/domain/models/product_model.dart';
 import 'package:deels_here/main.dart';
 import 'package:get/get.dart';
 

@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   width: constraints.maxWidth,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/images/spalsh_backg.webp'),
+                      image: AssetImage('assets/images/backg.jpg'),
                       fit: BoxFit.cover,
                     ),
                   ),

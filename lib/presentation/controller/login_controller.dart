@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deels_here/domain/models/user_model.dart';
 import 'package:deels_here/main.dart';
+import 'package:deels_here/presentation/screens/login_screen.dart';
 import 'package:deels_here/presentation/screens/main_screen.dart';
+import 'package:deels_here/services/user_shared_prefs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -25,6 +27,8 @@ class LoginController extends GetxController {
 
       if (snapshot.docs.isNotEmpty) {
         currentUser = UserModel.fromJson(snapshot.docs.first.data());
+        saveUserToSharedPreferences(currentUser!);
+
         // snack bar for suucess
         Get.showSnackbar(
           GetSnackBar(
@@ -34,6 +38,7 @@ class LoginController extends GetxController {
             duration: Duration(seconds: 2),
           ),
         );
+        isGuest = false;
         // Navigate to main screen
         Get.offAll(MainScreen()); // Assuming you have a route named '/main'
       } else {
@@ -69,5 +74,18 @@ class LoginController extends GetxController {
       isLoading = false;
       update(); // Notify listeners that loading has completed
     }
+  }
+
+  // logoit user
+  bool isLoggingOut = false;
+
+  logout() async {
+    isLoggingOut = true;
+    update();
+    await Future.delayed(Duration(seconds: 2));
+    sharedPreferences!.remove('user');
+    currentUser = null;
+    isLoggingOut = false;
+    update();
   }
 }

@@ -6,18 +6,25 @@ import 'package:deels_here/presentation/controller/home_controller.dart';
 import 'package:deels_here/presentation/controller/login_controller.dart';
 import 'package:deels_here/presentation/controller/signup_controller.dart';
 import 'package:deels_here/presentation/screens/login_screen.dart';
+import 'package:deels_here/presentation/screens/main_screen.dart';
 import 'package:deels_here/presentation/screens/splash_screen.dart';
+import 'package:deels_here/services/user_shared_prefs.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 UserModel? currentUser;
 
+// Shared preferences for storing user data
+SharedPreferences? sharedPreferences;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  sharedPreferences = await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 
@@ -27,6 +34,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // check if there is a saved user
+    String? userJson = sharedPreferences!.getString('user');
+    bool isUserSaved;
+    if (userJson != null) {
+      getSavedUser();
+      isUserSaved = true;
+    } else {
+      isUserSaved = false;
+      print('No user found in shared preferences');
+    }
     return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -41,7 +58,7 @@ class MyApp extends StatelessWidget {
         Get.put(HomeController());
         // Get.find<HomeController>().uploadProducts();
       }),
-      home: SplashScreen(),
+      home: isUserSaved ? MainScreen() : SplashScreen(),
     );
   }
 }

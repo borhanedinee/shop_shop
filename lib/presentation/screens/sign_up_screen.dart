@@ -1,11 +1,15 @@
 // ----------------- presentation/views/login_screen.dart -----------------
+import 'dart:convert';
+
 import 'package:deels_here/domain/models/user_model.dart';
 import 'package:deels_here/main.dart';
 import 'package:deels_here/presentation/controller/login_controller.dart';
 import 'package:deels_here/presentation/controller/signup_controller.dart';
+import 'package:deels_here/presentation/screens/login_screen.dart';
 import 'package:deels_here/presentation/screens/main_screen.dart';
 import 'package:deels_here/presentation/widgets/my_button.dart';
 import 'package:deels_here/presentation/widgets/my_field.dart';
+import 'package:deels_here/services/user_shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -170,6 +174,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     .signUpUser(user)
                                     .then((error) {
                                       if (error == null) {
+                                        // save user to shared preferences
+                                        saveUserToSharedPreferences(user);
                                         // save user
                                         currentUser = user;
                                         Get.showSnackbar(
@@ -181,6 +187,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             snackPosition: SnackPosition.BOTTOM,
                                           ),
                                         );
+                                        isGuest = false;
+
                                         // Navigate to login screen
                                         Navigator.of(
                                           context,
